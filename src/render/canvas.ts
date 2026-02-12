@@ -30,7 +30,9 @@ export const createCanvasSurface = (canvas: HTMLCanvasElement): CanvasSurface =>
     canvas.height = Math.floor(height * dpr);
     context.setTransform(dpr, 0, 0, dpr, 0, 0);
     context.imageSmoothingEnabled = false;
-    log.debug(`画布调整: CSS ${width}×${height}, 物理 ${canvas.width}×${canvas.height}, DPR ${dpr.toFixed(2)}`);
+    log.debug(
+      `画布调整: CSS ${width}×${height}, 物理 ${canvas.width}×${canvas.height}, DPR ${dpr.toFixed(2)}`
+    );
   };
 
   resize();

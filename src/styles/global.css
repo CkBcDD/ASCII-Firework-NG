@@ -4,8 +4,9 @@
   /* ⚠ 与 src/config.ts 中 BG_COLOR / FONT_FAMILY 保持同步 */
   --bg-color: #05070d;
   --ascii-text-color: #c7ddff;
-  --font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
-    'Courier New', monospace;
+  --font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+    monospace;
 }
 
 * {

@@ -16,7 +16,7 @@ import {
   ASCII_SAMPLE_INTERVAL_HIGH,
   ASCII_SAMPLE_INTERVAL_LOW,
   ASCII_DIRTY_BRIGHTNESS_EPSILON,
-  ASCII_DIRTY_FULL_REDRAW_RATIO,
+  ASCII_DIRTY_FULL_REDRAW_RATIO
 } from '../config';
 
 /**
@@ -58,6 +58,7 @@ export const createAsciiLayer = (): AsciiLayer => {
   let sampleInterval = ASCII_SAMPLE_INTERVAL_HIGH;
   let sampleTick = 0;
   let forceFullRedraw = true;
+  const colorStyleCache = new Map<number, string>();
 
   let previousChars = new Uint16Array(1);
   let previousColors = new Uint32Array(1);
@@ -69,7 +70,8 @@ export const createAsciiLayer = (): AsciiLayer => {
   const isDirtyCell = (index: number) => {
     const charChanged = nextChars[index] !== previousChars[index];
     const colorChanged = nextColors[index] !== previousColors[index];
-    const brightnessChanged = Math.abs(nextBrightness[index] - previousBrightness[index]) > ASCII_DIRTY_BRIGHTNESS_EPSILON;
+    const brightnessChanged =
+      Math.abs(nextBrightness[index] - previousBrightness[index]) > ASCII_DIRTY_BRIGHTNESS_EPSILON;
     return charChanged || colorChanged || brightnessChanged;
   };
 
@@ -81,6 +83,19 @@ export const createAsciiLayer = (): AsciiLayer => {
     nextChars = new Uint16Array(cellCount);
     nextColors = new Uint32Array(cellCount);
     nextBrightness = new Uint16Array(cellCount);
+  };
+
+  const getColorStyle = (colorCode: number) => {
+    const cached = colorStyleCache.get(colorCode);
+    if (cached) {
+      return cached;
+    }
+    const red = (colorCode >> 16) & 255;
+    const green = (colorCode >> 8) & 255;
+    const blue = colorCode & 255;
+    const style = `rgb(${red}, ${green}, ${blue})`;
+    colorStyleCache.set(colorCode, style);
+    return style;
   };
 
   const resize = (width: number, height: number, qualityScale: number) => {
@@ -100,13 +115,17 @@ export const createAsciiLayer = (): AsciiLayer => {
     asciiFrameContext.fillStyle = BG_COLOR;
     asciiFrameContext.fillRect(0, 0, worldWidth, worldHeight);
 
-    sampleInterval = qualityScale <= QUALITY_LOW ? ASCII_SAMPLE_INTERVAL_LOW : ASCII_SAMPLE_INTERVAL_HIGH;
+    sampleInterval =
+      qualityScale <= QUALITY_LOW ? ASCII_SAMPLE_INTERVAL_LOW : ASCII_SAMPLE_INTERVAL_HIGH;
     sampleTick = 0;
     forceFullRedraw = true;
     ensureCellCache();
+    colorStyleCache.clear();
 
     cachedFontSize = 0;
-    log.info(`缓冲区调整: ${columns}×${rows} 单元格, 世界: ${worldWidth}×${worldHeight}, 质量: ${qualityScale}`);
+    log.info(
+      `缓冲区调整: ${columns}×${rows} 单元格, 世界: ${worldWidth}×${worldHeight}, 质量: ${qualityScale}`
+    );
   };
 
   const fade = () => {
@@ -148,13 +167,17 @@ export const createAsciiLayer = (): AsciiLayer => {
       forceFullRedraw = true;
     }
 
-    const shouldSample = sampleTick === 0 || forceFullRedraw;
-    sampleTick = (sampleTick + 1) % Math.max(1, sampleInterval);
+    const currentFps = (window as Window & { __fps?: number }).__fps ?? DEFAULT_FPS;
+    const dynamicSampleInterval =
+      currentFps < 35 ? sampleInterval + 2 : currentFps < 45 ? sampleInterval + 1 : sampleInterval;
+    const shouldSample = sampleTick <= 0 || forceFullRedraw;
+    sampleTick = shouldSample ? Math.max(0, dynamicSampleInterval - 1) : sampleTick - 1;
 
     if (shouldSample) {
       const imageData = bufferContext.getImageData(0, 0, columns, rows).data;
       const totalCells = columns * rows;
       let dirtyCells = 0;
+      const dirtyIndexes: number[] = [];
 
       for (let index = 0; index < totalCells; index += 1) {
         const pixelIndex = index * 4;
@@ -171,6 +194,7 @@ export const createAsciiLayer = (): AsciiLayer => {
 
         if (forceFullRedraw || isDirtyCell(index)) {
           dirtyCells += 1;
+          dirtyIndexes.push(index);
         }
       }
 
@@ -195,11 +219,12 @@ export const createAsciiLayer = (): AsciiLayer => {
               continue;
             }
             const colorCode = nextColors[index] ?? 0;
-            const red = (colorCode >> 16) & 255;
-            const green = (colorCode >> 8) & 255;
-            const blue = colorCode & 255;
-            asciiFrameContext.fillStyle = `rgb(${red}, ${green}, ${blue})`;
-            asciiFrameContext.fillText(String.fromCharCode(charCode), column * cachedCharWidth, row * drawCellHeight);
+            asciiFrameContext.fillStyle = getColorStyle(colorCode);
+            asciiFrameContext.fillText(
+              String.fromCharCode(charCode),
+              column * cachedCharWidth,
+              row * drawCellHeight
+            );
           }
         }
 
@@ -207,36 +232,34 @@ export const createAsciiLayer = (): AsciiLayer => {
       } else {
         asciiFrameContext.setTransform(1, 0, 0, 1, 0, 0);
         asciiFrameContext.fillStyle = BG_COLOR;
-        for (let row = 0; row < rows; row += 1) {
-          for (let column = 0; column < columns; column += 1) {
-            const index = row * columns + column;
-            if (!isDirtyCell(index)) {
-              continue;
-            }
-            asciiFrameContext.fillRect(column * drawCellWidth, row * drawCellHeight, drawCellWidth, drawCellHeight);
-          }
+        for (const index of dirtyIndexes) {
+          const row = Math.floor(index / columns);
+          const column = index % columns;
+          asciiFrameContext.fillRect(
+            column * drawCellWidth,
+            row * drawCellHeight,
+            drawCellWidth,
+            drawCellHeight
+          );
         }
 
         asciiFrameContext.save();
         asciiFrameContext.scale(hStretch, 1);
 
-        for (let row = 0; row < rows; row += 1) {
-          for (let column = 0; column < columns; column += 1) {
-            const index = row * columns + column;
-            if (!isDirtyCell(index)) {
-              continue;
-            }
-            const charCode = nextChars[index] ?? 32;
-            if (charCode === 32) {
-              continue;
-            }
-            const colorCode = nextColors[index] ?? 0;
-            const red = (colorCode >> 16) & 255;
-            const green = (colorCode >> 8) & 255;
-            const blue = colorCode & 255;
-            asciiFrameContext.fillStyle = `rgb(${red}, ${green}, ${blue})`;
-            asciiFrameContext.fillText(String.fromCharCode(charCode), column * cachedCharWidth, row * drawCellHeight);
+        for (const index of dirtyIndexes) {
+          const charCode = nextChars[index] ?? 32;
+          if (charCode === 32) {
+            continue;
           }
+          const row = Math.floor(index / columns);
+          const column = index % columns;
+          const colorCode = nextColors[index] ?? 0;
+          asciiFrameContext.fillStyle = getColorStyle(colorCode);
+          asciiFrameContext.fillText(
+            String.fromCharCode(charCode),
+            column * cachedCharWidth,
+            row * drawCellHeight
+          );
         }
 
         asciiFrameContext.restore();

@@ -39,16 +39,18 @@ export const BRIGHTNESS_VARIANCE = 0.5;
 
 /** 亮度衰减缓动指数 */
 export const BRIGHTNESS_DECAY_EXPONENT = 1.5;
+/** 粒子透明度量化桶数量（用于减少 fillStyle 变更） */
+export const PARTICLE_ALPHA_BUCKETS = 24;
 
 // ── 赛博朋克霓虹色板 (R, G, B) ──────────────────────────────
 export const NEON_PALETTES: readonly (readonly [number, number, number])[] = [
-    [0, 255, 255],    // Cyber Cyan
-    [255, 0, 255],    // Neon Magenta
-    [50, 255, 50],    // Acid Green
-    [255, 255, 0],    // Electric Yellow
-    [255, 20, 147],   // Hot Pink
-    [0, 153, 255],    // Electric Blue
-    [255, 255, 255],  // Pure White (Flash)
+  [0, 255, 255], // Cyber Cyan
+  [255, 0, 255], // Neon Magenta
+  [50, 255, 50], // Acid Green
+  [255, 255, 0], // Electric Yellow
+  [255, 20, 147], // Hot Pink
+  [0, 153, 255], // Electric Blue
+  [255, 255, 255] // Pure White (Flash)
 ];
 
 // ── ASCII 渲染 ───────────────────────────────────────────────
@@ -90,6 +92,10 @@ export const TWINKLE_AMPLITUDE = 0.35;
 export const TWINKLE_OFFSET = 0.35;
 /** 星星渲染像素尺寸 */
 export const STAR_SIZE = 1;
+/** 星空高质量更新间隔（每 N 帧刷新一次） */
+export const STARFIELD_UPDATE_INTERVAL_HIGH = 1;
+/** 星空低质量更新间隔（每 N 帧刷新一次） */
+export const STARFIELD_UPDATE_INTERVAL_LOW = 2;
 
 // ── 质量 / 性能 ──────────────────────────────────────────────
 export const QUALITY_HIGH = 1;
@@ -106,6 +112,12 @@ export const ASCII_DIRTY_FULL_REDRAW_RATIO = 0.55;
 export const FPS_DOWNGRADE_THRESHOLD = 42;
 /** 高于此 FPS 自动恢复 */
 export const FPS_UPGRADE_THRESHOLD = 54;
+/** 高质量模式下的最大粒子预算 */
+export const PARTICLE_BUDGET_HIGH = 9000;
+/** 低质量模式下的最大粒子预算 */
+export const PARTICLE_BUDGET_LOW = 4500;
+/** 连发模式每帧最多触发爆炸次数（用于输入背压） */
+export const MAX_RAPID_FIRE_BURSTS_PER_FRAME = 2;
 /** FPS 采样窗口大小 */
 export const PERF_SAMPLE_SIZE = 50;
 /** resize 同步节流间隔 (ms) */

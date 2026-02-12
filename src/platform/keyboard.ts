@@ -6,9 +6,7 @@ export type KeyboardShortcutHandlers = {
 
 const log = createLogger('Keyboard');
 
-export const bindKeyboardShortcuts = (
-  handlers: KeyboardShortcutHandlers
-): (() => void) => {
+export const bindKeyboardShortcuts = (handlers: KeyboardShortcutHandlers): (() => void) => {
   const onKeyDown = (event: KeyboardEvent) => {
     if (event.altKey && event.key === 'F12') {
       event.preventDefault();

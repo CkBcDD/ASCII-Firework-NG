@@ -20,9 +20,7 @@ const clamp = (value: number, min: number, max: number): number => {
   return value;
 };
 
-export const createGodModePanel = (
-  options: CreateGodModePanelOptions
-): GodModePanelController => {
+export const createGodModePanel = (options: CreateGodModePanelOptions): GodModePanelController => {
   let state = {
     ...options.initialState,
     rapidFireHz: clamp(options.initialState.rapidFireHz, 5, 60)

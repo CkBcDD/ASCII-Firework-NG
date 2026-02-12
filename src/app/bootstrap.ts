@@ -13,9 +13,12 @@ import {
   QUALITY_LOW,
   FPS_DOWNGRADE_THRESHOLD,
   FPS_UPGRADE_THRESHOLD,
+  PARTICLE_BUDGET_HIGH,
+  PARTICLE_BUDGET_LOW,
+  MAX_RAPID_FIRE_BURSTS_PER_FRAME,
   APP_CANVAS_SELECTOR,
   RESIZE_THROTTLE_MS,
-  LOG_LEVEL,
+  LOG_LEVEL
 } from '../config';
 
 const log = createLogger('App');
@@ -75,6 +78,7 @@ export const bootstrap = (): void => {
   const surface = createCanvasSurface(canvas);
   const asciiLayer = createAsciiLayer();
   const fireworkSystem = createFireworkSystem();
+  fireworkSystem.setParticleBudget(PARTICLE_BUDGET_HIGH);
   const perfMonitor = createPerfMonitor();
   const { width, height } = surface.getCssSize();
   const starfield = createStarfield(width, height);
@@ -85,7 +89,7 @@ export const bootstrap = (): void => {
     x: width / 2,
     y: height / 2
   };
-  let lastRapidFireAtMs = 0;
+  let rapidFireAccumulatorMs = 0;
   let godModeState: GodModeState = {
     panelVisible: false,
     rapidFireEnabled: false,
@@ -110,24 +114,31 @@ export const bootstrap = (): void => {
   };
 
   syncSize();
-  const { handler: onResize, cancel: cancelResizeThrottle } = createThrottledHandler(syncSize, RESIZE_THROTTLE_MS);
+  const { handler: onResize, cancel: cancelResizeThrottle } = createThrottledHandler(
+    syncSize,
+    RESIZE_THROTTLE_MS
+  );
 
-  const unbindPointer = bindPointer(surface.canvas, ({ x, y }) => {
-    fireworkSystem.explode(x, y);
-  }, {
-    onPointerDown: (point) => {
-      pointerPressed = true;
-      pointerPosition = point;
-      lastRapidFireAtMs = 0;
+  const unbindPointer = bindPointer(
+    surface.canvas,
+    ({ x, y }) => {
+      fireworkSystem.explode(x, y);
     },
-    onPointerMove: (point) => {
-      pointerPosition = point;
-    },
-    onPointerUp: () => {
-      pointerPressed = false;
-      lastRapidFireAtMs = 0;
+    {
+      onPointerDown: (point) => {
+        pointerPressed = true;
+        pointerPosition = point;
+        rapidFireAccumulatorMs = 0;
+      },
+      onPointerMove: (point) => {
+        pointerPosition = point;
+      },
+      onPointerUp: () => {
+        pointerPressed = false;
+        rapidFireAccumulatorMs = 0;
+      }
     }
-  });
+  );
 
   const unbindKeyboard = bindKeyboardShortcuts({
     onToggleGodModePanel: () => {
@@ -137,12 +148,17 @@ export const bootstrap = (): void => {
 
   const ticker = createTicker((deltaSeconds, elapsedSeconds) => {
     if (pointerPressed && godModeState.rapidFireEnabled) {
-      const nowMs = elapsedSeconds * 1000;
       const intervalMs = 1000 / godModeState.rapidFireHz;
-      if (lastRapidFireAtMs === 0 || nowMs - lastRapidFireAtMs >= intervalMs) {
+      rapidFireAccumulatorMs += deltaSeconds * 1000;
+      const pendingBursts = Math.floor(rapidFireAccumulatorMs / intervalMs);
+      const burstsToRun = Math.min(MAX_RAPID_FIRE_BURSTS_PER_FRAME, pendingBursts);
+      for (let burst = 0; burst < burstsToRun; burst += 1) {
         fireworkSystem.explode(pointerPosition.x, pointerPosition.y);
-        lastRapidFireAtMs = nowMs;
       }
+      rapidFireAccumulatorMs -= pendingBursts * intervalMs;
+      rapidFireAccumulatorMs = Math.max(0, Math.min(rapidFireAccumulatorMs, intervalMs));
+    } else {
+      rapidFireAccumulatorMs = 0;
     }
 
     perfMonitor.sample(deltaSeconds);
@@ -152,11 +168,17 @@ export const bootstrap = (): void => {
     if (fps < FPS_DOWNGRADE_THRESHOLD && quality !== QUALITY_LOW) {
       // 使用双阈值避免在临界 FPS 附近频繁抖动（hysteresis）。
       quality = QUALITY_LOW;
-      log.warn(`性能降级: FPS=${Math.round(fps)} < ${FPS_DOWNGRADE_THRESHOLD}, 切换为低质量 (${QUALITY_LOW})`);
+      fireworkSystem.setParticleBudget(PARTICLE_BUDGET_LOW);
+      log.warn(
+        `性能降级: FPS=${Math.round(fps)} < ${FPS_DOWNGRADE_THRESHOLD}, 切换为低质量 (${QUALITY_LOW})`
+      );
       syncSize();
     } else if (fps > FPS_UPGRADE_THRESHOLD && quality !== QUALITY_HIGH) {
       quality = QUALITY_HIGH;
-      log.info(`性能恢复: FPS=${Math.round(fps)} > ${FPS_UPGRADE_THRESHOLD}, 切换为高质量 (${QUALITY_HIGH})`);
+      fireworkSystem.setParticleBudget(PARTICLE_BUDGET_HIGH);
+      log.info(
+        `性能恢复: FPS=${Math.round(fps)} > ${FPS_UPGRADE_THRESHOLD}, 切换为高质量 (${QUALITY_HIGH})`
+      );
       syncSize();
     }
 
