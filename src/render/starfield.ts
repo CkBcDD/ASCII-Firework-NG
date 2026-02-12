@@ -20,6 +20,9 @@ type Star = {
   base: number;
 };
 
+/**
+ * 星空层对外能力。
+ */
 export type Starfield = {
   resize: (width: number, height: number) => void;
   render: (ctx: CanvasRenderingContext2D, elapsed: number) => void;
@@ -27,6 +30,9 @@ export type Starfield = {
 
 const log = createLogger('Starfield');
 
+/**
+ * 创建星空层实例。
+ */
 export const createStarfield = (width: number, height: number): Starfield => {
   let stars: Star[] = [];
   let areaWidth = width;
@@ -52,6 +58,7 @@ export const createStarfield = (width: number, height: number): Starfield => {
 
   const render = (ctx: CanvasRenderingContext2D, elapsed: number) => {
     for (const star of stars) {
+      // 通过相位 + 速度构造不同频率闪烁，避免整屏同步明暗造成“呼吸灯”感。
       const alpha = Math.min(1, star.base + Math.sin(elapsed * star.speed + star.phase) * TWINKLE_AMPLITUDE + TWINKLE_OFFSET);
       ctx.fillStyle = `rgba(${STAR_COLOR_RGB[0]}, ${STAR_COLOR_RGB[1]}, ${STAR_COLOR_RGB[2]}, ${alpha})`;
       ctx.fillRect(star.x, star.y, STAR_SIZE, STAR_SIZE);

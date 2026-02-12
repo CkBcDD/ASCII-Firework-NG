@@ -35,12 +35,18 @@ type Particle = {
 
 const log = createLogger('Firework');
 
+/**
+ * 烟花粒子系统对外能力。
+ */
 export type FireworkSystem = {
   explode: (x: number, y: number) => void;
   update: (deltaSeconds: number) => void;
   render: (ctx: CanvasRenderingContext2D) => void;
 };
 
+/**
+ * 创建烟花粒子系统实例。
+ */
 export const createFireworkSystem = (): FireworkSystem => {
   const particles: Particle[] = [];
 

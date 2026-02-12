@@ -5,6 +5,9 @@
  * 每条日志格式：[HH:mm:ss.SSS] [LEVEL] [Module] message
  */
 
+/**
+ * 数值型日志级别（用于高效比较与过滤）。
+ */
 export const enum LogLevel {
     DEBUG = 0,
     INFO = 1,
@@ -12,6 +15,11 @@ export const enum LogLevel {
     ERROR = 3,
     SILENT = 4,
 }
+
+/**
+ * 文本型日志级别（适合配置项与文档表达）。
+ */
+export type LogLevelName = 'debug' | 'info' | 'warn' | 'error' | 'silent';
 
 export type Logger = {
     debug: (message: string, ...data: unknown[]) => void;
@@ -22,10 +30,32 @@ export type Logger = {
 
 let currentLevel: LogLevel = LogLevel.DEBUG;
 
-export const setLogLevel = (level: LogLevel): void => {
-    currentLevel = level;
+const LEVEL_BY_NAME: Record<LogLevelName, LogLevel> = {
+    debug: LogLevel.DEBUG,
+    info: LogLevel.INFO,
+    warn: LogLevel.WARN,
+    error: LogLevel.ERROR,
+    silent: LogLevel.SILENT,
 };
 
+/**
+ * 将日志级别配置转换为可比较的数值级别。
+ */
+export const toLogLevel = (level: LogLevel | LogLevelName): LogLevel =>
+    typeof level === 'string' ? LEVEL_BY_NAME[level] : level;
+
+/**
+ * 设置全局日志输出阈值。
+ *
+ * @param level 日志级别（支持数值枚举与文本级别）。
+ */
+export const setLogLevel = (level: LogLevel | LogLevelName): void => {
+    currentLevel = toLogLevel(level);
+};
+
+/**
+ * 获取当前全局日志输出阈值。
+ */
 export const getLogLevel = (): LogLevel => currentLevel;
 
 const pad2 = (n: number): string => (n < 10 ? '0' : '') + n;
@@ -58,8 +88,14 @@ const resolveConsoleFn = (level: LogLevel) =>
                 ? console.info
                 : console.debug;
 
+/**
+ * 创建作用域日志记录器。
+ *
+ * @param scope 日志作用域（通常为模块名）。
+ */
 export const createLogger = (scope: string): Logger => {
     const emit = (level: LogLevel, message: string, data: unknown[]) => {
+        // 统一在入口做阈值过滤，避免各调用点重复判断。
         if (level < currentLevel) return;
         const tag = LEVEL_TAG[level];
         const style = LEVEL_STYLE[level];

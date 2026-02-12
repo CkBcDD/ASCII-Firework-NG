@@ -1,8 +1,10 @@
 import { createFireworkSystem } from '../engine/firework';
 import { createTicker } from '../engine/ticker';
 import { bindPointer } from '../platform/pointer';
+import { bindKeyboardShortcuts } from '../platform/keyboard';
 import { createPerfMonitor } from '../platform/perf';
-import { createLogger } from '../platform/logger';
+import { createLogger, setLogLevel } from '../platform/logger';
+import { createGodModePanel, type GodModeState } from './godModePanel';
 import { createAsciiLayer } from '../render/asciiLayer';
 import { createCanvasSurface } from '../render/canvas';
 import { createStarfield } from '../render/starfield';
@@ -13,6 +15,7 @@ import {
   FPS_UPGRADE_THRESHOLD,
   APP_CANVAS_SELECTOR,
   RESIZE_THROTTLE_MS,
+  LOG_LEVEL,
 } from '../config';
 
 const log = createLogger('App');
@@ -59,6 +62,9 @@ const createThrottledHandler = (callback: () => void, intervalMs: number) => {
 };
 
 export const bootstrap = (): void => {
+  // 在任何业务日志输出前设置全局日志阈值，保证启动期日志也受配置控制。
+  setLogLevel(LOG_LEVEL);
+
   const canvas = document.querySelector<HTMLCanvasElement>(APP_CANVAS_SELECTOR);
   if (!canvas) {
     throw new Error(`未找到 ${APP_CANVAS_SELECTOR} 画布。`);
@@ -74,6 +80,26 @@ export const bootstrap = (): void => {
   const starfield = createStarfield(width, height);
 
   let quality = QUALITY_HIGH;
+  let pointerPressed = false;
+  let pointerPosition = {
+    x: width / 2,
+    y: height / 2
+  };
+  let lastRapidFireAtMs = 0;
+  let godModeState: GodModeState = {
+    panelVisible: false,
+    rapidFireEnabled: false,
+    rapidFireHz: 20
+  };
+
+  const setGodModeState = (nextState: GodModeState) => {
+    godModeState = nextState;
+  };
+
+  const godModePanel = createGodModePanel({
+    initialState: godModeState,
+    onStateChange: setGodModeState
+  });
 
   const syncSize = () => {
     surface.resize();
@@ -88,14 +114,43 @@ export const bootstrap = (): void => {
 
   const unbindPointer = bindPointer(surface.canvas, ({ x, y }) => {
     fireworkSystem.explode(x, y);
+  }, {
+    onPointerDown: (point) => {
+      pointerPressed = true;
+      pointerPosition = point;
+      lastRapidFireAtMs = 0;
+    },
+    onPointerMove: (point) => {
+      pointerPosition = point;
+    },
+    onPointerUp: () => {
+      pointerPressed = false;
+      lastRapidFireAtMs = 0;
+    }
+  });
+
+  const unbindKeyboard = bindKeyboardShortcuts({
+    onToggleGodModePanel: () => {
+      godModePanel.setVisible(!godModeState.panelVisible);
+    }
   });
 
   const ticker = createTicker((deltaSeconds, elapsedSeconds) => {
+    if (pointerPressed && godModeState.rapidFireEnabled) {
+      const nowMs = elapsedSeconds * 1000;
+      const intervalMs = 1000 / godModeState.rapidFireHz;
+      if (lastRapidFireAtMs === 0 || nowMs - lastRapidFireAtMs >= intervalMs) {
+        fireworkSystem.explode(pointerPosition.x, pointerPosition.y);
+        lastRapidFireAtMs = nowMs;
+      }
+    }
+
     perfMonitor.sample(deltaSeconds);
     const fps = perfMonitor.getFps();
     (window as Window & { __fps?: number }).__fps = fps;
 
     if (fps < FPS_DOWNGRADE_THRESHOLD && quality !== QUALITY_LOW) {
+      // 使用双阈值避免在临界 FPS 附近频繁抖动（hysteresis）。
       quality = QUALITY_LOW;
       log.warn(`性能降级: FPS=${Math.round(fps)} < ${FPS_DOWNGRADE_THRESHOLD}, 切换为低质量 (${QUALITY_LOW})`);
       syncSize();
@@ -137,6 +192,8 @@ export const bootstrap = (): void => {
     log.info('页面卸载，清理资源…');
     ticker.stop();
     unbindPointer();
+    unbindKeyboard();
+    godModePanel.destroy();
     cancelResizeThrottle();
     window.removeEventListener('resize', onResize);
     document.removeEventListener('visibilitychange', onVisibilityChange);

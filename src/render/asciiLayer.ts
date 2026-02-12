@@ -19,6 +19,9 @@ import {
   ASCII_DIRTY_FULL_REDRAW_RATIO,
 } from '../config';
 
+/**
+ * ASCII 渲染层对外能力。
+ */
 export type AsciiLayer = {
   resize: (width: number, height: number, qualityScale: number) => void;
   fade: () => void;
@@ -28,6 +31,9 @@ export type AsciiLayer = {
 
 const log = createLogger('AsciiLayer');
 
+/**
+ * 创建 ASCII 渲染层：负责离屏采样、字符映射与增量重绘。
+ */
 export const createAsciiLayer = (): AsciiLayer => {
   const buffer = document.createElement('canvas');
   const bufferContext = buffer.getContext('2d', { alpha: false, willReadFrequently: true });
@@ -169,6 +175,7 @@ export const createAsciiLayer = (): AsciiLayer => {
       }
 
       const dirtyRatio = dirtyCells / Math.max(1, totalCells);
+      // 当脏单元占比过高时，全量重绘通常比逐格更新更快且更稳定。
       const redrawAll = forceFullRedraw || dirtyRatio > ASCII_DIRTY_FULL_REDRAW_RATIO;
       const hStretch = drawCellWidth / cachedCharWidth;
 

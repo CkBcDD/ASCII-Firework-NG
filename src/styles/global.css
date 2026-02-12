@@ -3,6 +3,7 @@
 
   /* ⚠ 与 src/config.ts 中 BG_COLOR / FONT_FAMILY 保持同步 */
   --bg-color: #05070d;
+  --ascii-text-color: #c7ddff;
   --font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
     'Courier New', monospace;
 }
@@ -22,10 +23,58 @@ body {
 
 body {
   font-family: var(--font-family);
+  color: var(--ascii-text-color);
 }
 
 #app {
   width: 100%;
   height: 100%;
   display: block;
+}
+
+.god-mode-panel {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 10;
+  min-width: 220px;
+  padding: 10px 12px;
+  border: 1px solid currentColor;
+  background: var(--bg-color);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.god-mode-panel.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.god-mode-title {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+
+.god-mode-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+
+.god-mode-frequency {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 6px 8px;
+}
+
+.god-mode-frequency-label,
+.god-mode-frequency-value {
+  font-size: 12px;
+}
+
+.god-mode-frequency input[type='range'] {
+  grid-column: 1 / -1;
 }

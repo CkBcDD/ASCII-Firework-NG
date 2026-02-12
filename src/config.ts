@@ -125,3 +125,12 @@ export const MAX_DELTA = 1 / 20;
 
 // ── App ──────────────────────────────────────────────────────
 export const APP_CANVAS_SELECTOR = '#app';
+
+// ── 日志 ─────────────────────────────────────────────────────
+/**
+ * 全局日志输出级别阈值。
+ *
+ * 级别从低到高：debug < info < warn < error < silent。
+ * 仅当日志级别大于等于该阈值时才会输出。
+ */
+export const LOG_LEVEL = 'error' as const;
