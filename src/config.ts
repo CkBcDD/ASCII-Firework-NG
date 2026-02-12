@@ -94,12 +94,22 @@ export const STAR_SIZE = 1;
 // ── 质量 / 性能 ──────────────────────────────────────────────
 export const QUALITY_HIGH = 1;
 export const QUALITY_LOW = 0.8;
+/** ASCII 高质量模式采样间隔（每 N 帧采样一次） */
+export const ASCII_SAMPLE_INTERVAL_HIGH = 1;
+/** ASCII 低质量模式采样间隔（每 N 帧采样一次） */
+export const ASCII_SAMPLE_INTERVAL_LOW = 3;
+/** 增量重绘亮度变化阈值（0-255） */
+export const ASCII_DIRTY_BRIGHTNESS_EPSILON = 8;
+/** 脏单元占比超过此阈值时回退全量重绘 */
+export const ASCII_DIRTY_FULL_REDRAW_RATIO = 0.55;
 /** 低于此 FPS 自动降级 */
 export const FPS_DOWNGRADE_THRESHOLD = 42;
 /** 高于此 FPS 自动恢复 */
 export const FPS_UPGRADE_THRESHOLD = 54;
 /** FPS 采样窗口大小 */
 export const PERF_SAMPLE_SIZE = 50;
+/** resize 同步节流间隔 (ms) */
+export const RESIZE_THROTTLE_MS = 80;
 /** 无采样数据时的默认 FPS */
 export const DEFAULT_FPS = 60;
 /** 避免除零的最小平均帧时间 */

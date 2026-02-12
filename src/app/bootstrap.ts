@@ -12,9 +12,51 @@ import {
   FPS_DOWNGRADE_THRESHOLD,
   FPS_UPGRADE_THRESHOLD,
   APP_CANVAS_SELECTOR,
+  RESIZE_THROTTLE_MS,
 } from '../config';
 
 const log = createLogger('App');
+
+const createThrottledHandler = (callback: () => void, intervalMs: number) => {
+  let timeoutId: number | null = null;
+  let lastInvokeAt = 0;
+
+  const invoke = () => {
+    timeoutId = null;
+    lastInvokeAt = performance.now();
+    callback();
+  };
+
+  const handler = () => {
+    const elapsed = performance.now() - lastInvokeAt;
+    const remaining = intervalMs - elapsed;
+
+    if (remaining <= 0) {
+      if (timeoutId !== null) {
+        window.clearTimeout(timeoutId);
+        timeoutId = null;
+      }
+      invoke();
+      return;
+    }
+
+    if (timeoutId === null) {
+      timeoutId = window.setTimeout(invoke, remaining);
+    }
+  };
+
+  const cancel = () => {
+    if (timeoutId !== null) {
+      window.clearTimeout(timeoutId);
+      timeoutId = null;
+    }
+  };
+
+  return {
+    handler,
+    cancel
+  };
+};
 
 export const bootstrap = (): void => {
   const canvas = document.querySelector<HTMLCanvasElement>(APP_CANVAS_SELECTOR);
@@ -42,6 +84,7 @@ export const bootstrap = (): void => {
   };
 
   syncSize();
+  const { handler: onResize, cancel: cancelResizeThrottle } = createThrottledHandler(syncSize, RESIZE_THROTTLE_MS);
 
   const unbindPointer = bindPointer(surface.canvas, ({ x, y }) => {
     fireworkSystem.explode(x, y);
@@ -84,7 +127,7 @@ export const bootstrap = (): void => {
     }
   };
 
-  window.addEventListener('resize', syncSize);
+  window.addEventListener('resize', onResize);
   document.addEventListener('visibilitychange', onVisibilityChange);
 
   ticker.start();
@@ -94,7 +137,8 @@ export const bootstrap = (): void => {
     log.info('页面卸载，清理资源…');
     ticker.stop();
     unbindPointer();
-    window.removeEventListener('resize', syncSize);
+    cancelResizeThrottle();
+    window.removeEventListener('resize', onResize);
     document.removeEventListener('visibilitychange', onVisibilityChange);
   });
 };

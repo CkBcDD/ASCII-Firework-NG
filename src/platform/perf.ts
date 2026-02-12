@@ -6,20 +6,29 @@ export type PerfMonitor = {
 };
 
 export const createPerfMonitor = (): PerfMonitor => {
-  const frameTimes: number[] = [];
+  const frameTimes = new Float64Array(PERF_SAMPLE_SIZE);
+  let sampleCount = 0;
+  let writeIndex = 0;
+  let totalFrameTime = 0;
 
   const sample = (deltaSeconds: number) => {
-    frameTimes.push(deltaSeconds);
-    if (frameTimes.length > PERF_SAMPLE_SIZE) {
-      frameTimes.shift();
+    if (sampleCount < PERF_SAMPLE_SIZE) {
+      frameTimes[writeIndex] = deltaSeconds;
+      totalFrameTime += deltaSeconds;
+      sampleCount += 1;
+    } else {
+      totalFrameTime -= frameTimes[writeIndex] ?? 0;
+      frameTimes[writeIndex] = deltaSeconds;
+      totalFrameTime += deltaSeconds;
     }
+    writeIndex = (writeIndex + 1) % PERF_SAMPLE_SIZE;
   };
 
   const getFps = () => {
-    if (frameTimes.length === 0) {
+    if (sampleCount === 0) {
       return DEFAULT_FPS;
     }
-    const average = frameTimes.reduce((sum, value) => sum + value, 0) / frameTimes.length;
+    const average = totalFrameTime / sampleCount;
     return 1 / Math.max(average, MIN_AVG_FRAME_TIME);
   };
 
