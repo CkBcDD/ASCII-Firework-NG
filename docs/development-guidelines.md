@@ -63,6 +63,6 @@
 ## 提交流程建议
 
 - 在本地至少执行一次：
-  - `npm run lint`
-  - `npm run build`
+  - `pnpm run lint`
+  - `pnpm run build`
 - 变更 `LOG_LEVEL`、日志策略或注释规则时，同步更新本文档。

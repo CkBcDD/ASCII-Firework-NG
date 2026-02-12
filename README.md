@@ -25,33 +25,35 @@
 ### 1) 安装依赖
 
 ```bash
-npm install
+pnpm install
 ```
 
 ### 2) 本地开发
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 ### 3) 构建
 
 ```bash
-npm run build
+pnpm run build
 ```
 
 ### 4) 本地预览构建产物
 
 ```bash
-npm run preview
+pnpm run preview
 ```
 
 ## Cloudflare Pages 部署
 
 在 Cloudflare Pages 创建项目时使用：
 
-- Build command: `npm run build`
+- Build command: `pnpm run build`
 - Build output directory: `dist`
+
+完整初始化步骤见 [docs/cloudflare-pages-init.md](docs/cloudflare-pages-init.md)。
 
 本项目为纯静态前端，无需 server runtime。
 
