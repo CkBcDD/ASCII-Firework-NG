@@ -1,0 +1,31 @@
+:root {
+  color-scheme: dark;
+
+  /* ⚠ 与 src/config.ts 中 BG_COLOR / FONT_FAMILY 保持同步 */
+  --bg-color: #05070d;
+  --font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+    'Courier New', monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: var(--bg-color);
+}
+
+body {
+  font-family: var(--font-family);
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
