@@ -44,7 +44,7 @@ export const PARTICLE_ALPHA_BUCKETS = 24;
 
 // ── 烟花形态与特效 ───────────────────────────────────────────
 /** 升空弹初速度基础值 */
-export const LAUNCH_SPEED_BASE = 400;
+export const LAUNCH_SPEED_BASE = 800;
 /** 升空弹初速度随机范围 */
 export const LAUNCH_SPEED_VARIANCE = 150;
 /** 升空弹水平漂移速度 */
