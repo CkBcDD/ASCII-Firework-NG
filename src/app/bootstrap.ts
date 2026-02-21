@@ -122,7 +122,8 @@ export const bootstrap = (): void => {
   const unbindPointer = bindPointer(
     surface.canvas,
     ({ x, y }) => {
-      fireworkSystem.explode(x, y);
+      const size = surface.getCssSize();
+      fireworkSystem.launch(x, size.height, x, y);
     },
     {
       onPointerDown: (point) => {
@@ -153,7 +154,8 @@ export const bootstrap = (): void => {
       const pendingBursts = Math.floor(rapidFireAccumulatorMs / intervalMs);
       const burstsToRun = Math.min(MAX_RAPID_FIRE_BURSTS_PER_FRAME, pendingBursts);
       for (let burst = 0; burst < burstsToRun; burst += 1) {
-        fireworkSystem.explode(pointerPosition.x, pointerPosition.y);
+        const size = surface.getCssSize();
+        fireworkSystem.launch(pointerPosition.x, size.height, pointerPosition.x, pointerPosition.y);
       }
       rapidFireAccumulatorMs -= pendingBursts * intervalMs;
       rapidFireAccumulatorMs = Math.max(0, Math.min(rapidFireAccumulatorMs, intervalMs));

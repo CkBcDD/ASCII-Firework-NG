@@ -42,6 +42,38 @@ export const BRIGHTNESS_DECAY_EXPONENT = 1.5;
 /** 粒子透明度量化桶数量（用于减少 fillStyle 变更） */
 export const PARTICLE_ALPHA_BUCKETS = 24;
 
+// ── 烟花形态与特效 ───────────────────────────────────────────
+/** 升空弹初速度基础值 */
+export const LAUNCH_SPEED_BASE = 400;
+/** 升空弹初速度随机范围 */
+export const LAUNCH_SPEED_VARIANCE = 150;
+/** 升空弹水平漂移速度 */
+export const LAUNCH_DRIFT_VARIANCE = 40;
+/** 升空弹拖尾生成间隔 (s) */
+export const LAUNCH_TRAIL_INTERVAL = 0.02;
+
+/** 垂柳形态重力乘数 */
+export const WILLOW_GRAVITY_MULT = 1.8;
+/** 垂柳形态速度衰减乘数 */
+export const WILLOW_DRAG_MULT = 0.99;
+/** 垂柳形态寿命乘数 */
+export const WILLOW_TTL_MULT = 1.5;
+
+/** 十字星分裂阈值 (剩余寿命比例) */
+export const CROSSETTE_SPLIT_ENERGY = 0.4;
+/** 十字星分裂速度乘数 */
+export const CROSSETTE_SPLIT_SPEED = 0.6;
+
+/** 闪烁频率基础值 */
+export const STROBE_FREQ_BASE = 15;
+/** 闪烁频率随机范围 */
+export const STROBE_FREQ_VARIANCE = 10;
+
+/** 核心闪光寿命 (s) */
+export const FLASH_TTL = 0.15;
+/** 核心闪光尺寸乘数 */
+export const FLASH_SIZE_MULT = 4.0;
+
 // ── 赛博朋克霓虹色板 (R, G, B) ──────────────────────────────
 export const NEON_PALETTES: readonly (readonly [number, number, number])[] = [
   [0, 255, 255], // Cyber Cyan
