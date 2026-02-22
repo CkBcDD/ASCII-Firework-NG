@@ -51,6 +51,11 @@ export const LAUNCH_SPEED_VARIANCE = 150;
 export const LAUNCH_DRIFT_VARIANCE = 40;
 /** 升空弹拖尾生成间隔 (s) */
 export const LAUNCH_TRAIL_INTERVAL = 0.02;
+/**
+ * 是否跳过升空过程，在点击位置直接引爆烟花。
+ * 设为 true 后烟花将不再有升空弹轨迹，点击即爆。
+ */
+export const INSTANT_EXPLOSION = true;
 
 /** 垂柳形态重力乘数 */
 export const WILLOW_GRAVITY_MULT = 1.8;

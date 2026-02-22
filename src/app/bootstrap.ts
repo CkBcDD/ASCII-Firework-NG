@@ -18,7 +18,8 @@ import {
   MAX_RAPID_FIRE_BURSTS_PER_FRAME,
   APP_CANVAS_SELECTOR,
   RESIZE_THROTTLE_MS,
-  LOG_LEVEL
+  LOG_LEVEL,
+  INSTANT_EXPLOSION
 } from '../config';
 
 const log = createLogger('App');
@@ -122,8 +123,12 @@ export const bootstrap = (): void => {
   const unbindPointer = bindPointer(
     surface.canvas,
     ({ x, y }) => {
-      const size = surface.getCssSize();
-      fireworkSystem.launch(x, size.height, x, y);
+      if (INSTANT_EXPLOSION) {
+        fireworkSystem.explode(x, y);
+      } else {
+        const size = surface.getCssSize();
+        fireworkSystem.launch(x, size.height, x, y);
+      }
     },
     {
       onPointerDown: (point) => {
@@ -154,8 +159,12 @@ export const bootstrap = (): void => {
       const pendingBursts = Math.floor(rapidFireAccumulatorMs / intervalMs);
       const burstsToRun = Math.min(MAX_RAPID_FIRE_BURSTS_PER_FRAME, pendingBursts);
       for (let burst = 0; burst < burstsToRun; burst += 1) {
-        const size = surface.getCssSize();
-        fireworkSystem.launch(pointerPosition.x, size.height, pointerPosition.x, pointerPosition.y);
+        if (INSTANT_EXPLOSION) {
+          fireworkSystem.explode(pointerPosition.x, pointerPosition.y);
+        } else {
+          const size = surface.getCssSize();
+          fireworkSystem.launch(pointerPosition.x, size.height, pointerPosition.x, pointerPosition.y);
+        }
       }
       rapidFireAccumulatorMs -= pendingBursts * intervalMs;
       rapidFireAccumulatorMs = Math.max(0, Math.min(rapidFireAccumulatorMs, intervalMs));
