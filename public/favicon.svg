@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <rect width="32" height="32" rx="6" fill="#0a0a0f"/>
+  <!-- Firework burst rays -->
+  <g transform="translate(16,16)" stroke-linecap="round">
+    <!-- Core spark -->
+    <circle r="2.5" fill="#ffe566"/>
+    <!-- Main rays -->
+    <line x1="0" y1="-4" x2="0" y2="-12" stroke="#ff9500" stroke-width="2"/>
+    <line x1="0" y1="4"  x2="0"  y2="12" stroke="#ff9500" stroke-width="2"/>
+    <line x1="-4" y1="0" x2="-12" y2="0" stroke="#ff9500" stroke-width="2"/>
+    <line x1="4"  y1="0" x2="12"  y2="0" stroke="#ff9500" stroke-width="2"/>
+    <!-- Diagonal rays -->
+    <line x1="-2.8" y1="-2.8" x2="-8.5" y2="-8.5" stroke="#ffe566" stroke-width="1.5"/>
+    <line x1="2.8"  y1="-2.8" x2="8.5"  y2="-8.5" stroke="#ffe566" stroke-width="1.5"/>
+    <line x1="-2.8" y1="2.8"  x2="-8.5" y2="8.5"  stroke="#ffe566" stroke-width="1.5"/>
+    <line x1="2.8"  y1="2.8"  x2="8.5"  y2="8.5"  stroke="#ffe566" stroke-width="1.5"/>
+    <!-- Tip sparks -->
+    <circle cx="0"    cy="-12" r="1.2" fill="#ffe566"/>
+    <circle cx="0"    cy="12"  r="1.2" fill="#ffe566"/>
+    <circle cx="-12"  cy="0"   r="1.2" fill="#ffe566"/>
+    <circle cx="12"   cy="0"   r="1.2" fill="#ffe566"/>
+    <circle cx="-8.5" cy="-8.5" r="1" fill="#ff6b6b"/>
+    <circle cx="8.5"  cy="-8.5" r="1" fill="#ff6b6b"/>
+    <circle cx="-8.5" cy="8.5"  r="1" fill="#ff6b6b"/>
+    <circle cx="8.5"  cy="8.5"  r="1" fill="#ff6b6b"/>
+  </g>
+</svg>

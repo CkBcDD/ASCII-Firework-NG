@@ -1,13 +1,90 @@
 <!doctype html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ASCII Firework NG</title>
-  </head>
 
-  <body>
-    <canvas id="app" aria-label="ASCII Firework Game"></canvas>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+  <!-- ==================== Security ==================== -->
+  <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        script-src 'self' 'unsafe-inline';
+        style-src 'self' 'unsafe-inline';
+        img-src 'self' data: blob:;
+        connect-src 'self' ws: wss:;
+        worker-src 'self' blob:;
+        font-src 'self' data:;
+        upgrade-insecure-requests
+      " />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+
+  <!-- ==================== SEO ==================== -->
+  <title>ASCII Firework NG</title>
+  <meta name="description" content="在浏览器中用 ASCII 字符绘制绚丽烟花——一款轻量、沉浸式的视觉互动体验。" />
+  <meta name="keywords" content="ASCII, 烟花, firework, canvas, 动画, 互动, TypeScript" />
+  <meta name="author" content="CkBcDD" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://ascii-firework-ng.pages.dev/" />
+
+  <!-- ==================== Web App Appearance ==================== -->
+  <meta name="theme-color" content="#0a0a0f" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="ASCII Firework" />
+  <meta name="application-name" content="ASCII Firework NG" />
+
+  <!-- ==================== Icons ==================== -->
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/pwa-maskable-512x512.svg" />
+
+  <!-- ==================== Open Graph ==================== -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="ASCII Firework NG" />
+  <meta property="og:title" content="ASCII Firework NG" />
+  <meta property="og:description" content="在浏览器中用 ASCII 字符绘制绚丽烟花——一款轻量、沉浸式的视觉互动体验。" />
+  <meta property="og:image" content="/pwa-512x512.svg" />
+  <meta property="og:image:alt" content="ASCII Firework NG 烟花爆炸效果预览" />
+  <meta property="og:url" content="https://ascii-firework-ng.pages.dev/" />
+  <meta property="og:locale" content="zh_CN" />
+
+  <!-- ==================== Twitter Cards ==================== -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="ASCII Firework NG" />
+  <meta name="twitter:description" content="在浏览器中用 ASCII 字符绘制绚丽烟花——一款轻量、沉浸式的视觉互动体验。" />
+  <meta name="twitter:image" content="/pwa-512x512.svg" />
+  <meta name="twitter:image:alt" content="ASCII Firework NG 烟花爆炸效果预览" />
+</head>
+
+<body>
+  <canvas id="app" role="application" aria-label="ASCII Firework NG 互动烟花画布" aria-describedby="app-desc">
+    <p id="app-desc">此内容需要支持 Canvas 的现代浏览器。请升级您的浏览器以体验 ASCII 烟花动画。</p>
+  </canvas>
+
+  <noscript>
+    <style>
+      .noscript-banner {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #0a0a0f;
+        color: #ffe566;
+        font-family: monospace;
+        font-size: 1.2rem;
+        text-align: center;
+        padding: 2rem;
+      }
+    </style>
+    <div class="noscript-banner" role="alert">
+      ✦ ASCII Firework NG 需要 JavaScript 才能运行。<br />
+      请在浏览器设置中启用 JavaScript 后刷新页面。
+    </div>
+  </noscript>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
 </html>

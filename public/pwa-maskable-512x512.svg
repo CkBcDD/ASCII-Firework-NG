@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Full bleed background for maskable safe zone -->
+  <rect width="512" height="512" fill="#0a0a0f"/>
+  <!-- Soft glow background circle -->
+  <radialGradient id="glow" cx="50%" cy="50%" r="40%">
+    <stop offset="0%"   stop-color="#1a1a2e" stop-opacity="1"/>
+    <stop offset="100%" stop-color="#0a0a0f" stop-opacity="1"/>
+  </radialGradient>
+  <circle cx="256" cy="256" r="220" fill="url(#glow)"/>
+  <!-- Firework burst scaled to fit maskable safe zone (center 80%) -->
+  <g transform="translate(256,256)" stroke-linecap="round">
+    <circle r="26" fill="#ffe566"/>
+    <!-- Main rays -->
+    <line x1="0"    y1="-42"  x2="0"    y2="-148" stroke="#ff9500" stroke-width="20"/>
+    <line x1="0"    y1="42"   x2="0"    y2="148"  stroke="#ff9500" stroke-width="20"/>
+    <line x1="-42"  y1="0"    x2="-148" y2="0"    stroke="#ff9500" stroke-width="20"/>
+    <line x1="42"   y1="0"    x2="148"  y2="0"    stroke="#ff9500" stroke-width="20"/>
+    <!-- Diagonal rays -->
+    <line x1="-30"  y1="-30"  x2="-104" y2="-104" stroke="#ffe566" stroke-width="16"/>
+    <line x1="30"   y1="-30"  x2="104"  y2="-104" stroke="#ffe566" stroke-width="16"/>
+    <line x1="-30"  y1="30"   x2="-104" y2="104"  stroke="#ffe566" stroke-width="16"/>
+    <line x1="30"   y1="30"   x2="104"  y2="104"  stroke="#ffe566" stroke-width="16"/>
+    <!-- Tip sparks -->
+    <circle cx="0"    cy="-148" r="16" fill="#ffe566"/>
+    <circle cx="0"    cy="148"  r="16" fill="#ffe566"/>
+    <circle cx="-148" cy="0"    r="16" fill="#ffe566"/>
+    <circle cx="148"  cy="0"    r="16" fill="#ffe566"/>
+    <circle cx="-104" cy="-104" r="12" fill="#ff6b6b"/>
+    <circle cx="104"  cy="-104" r="12" fill="#ff6b6b"/>
+    <circle cx="-104" cy="104"  r="12" fill="#ff6b6b"/>
+    <circle cx="104"  cy="104"  r="12" fill="#ff6b6b"/>
+  </g>
+</svg>

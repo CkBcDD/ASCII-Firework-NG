@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" fill="#0a0a0f"/>
+  <g transform="translate(256,256)" stroke-linecap="round">
+    <circle r="36" fill="#ffe566"/>
+    <!-- Main rays -->
+    <line x1="0"    y1="-58"  x2="0"    y2="-192" stroke="#ff9500" stroke-width="26"/>
+    <line x1="0"    y1="58"   x2="0"    y2="192"  stroke="#ff9500" stroke-width="26"/>
+    <line x1="-58"  y1="0"    x2="-192" y2="0"    stroke="#ff9500" stroke-width="26"/>
+    <line x1="58"   y1="0"    x2="192"  y2="0"    stroke="#ff9500" stroke-width="26"/>
+    <!-- Diagonal rays -->
+    <line x1="-41"  y1="-41"  x2="-136" y2="-136" stroke="#ffe566" stroke-width="20"/>
+    <line x1="41"   y1="-41"  x2="136"  y2="-136" stroke="#ffe566" stroke-width="20"/>
+    <line x1="-41"  y1="41"   x2="-136" y2="136"  stroke="#ffe566" stroke-width="20"/>
+    <line x1="41"   y1="41"   x2="136"  y2="136"  stroke="#ffe566" stroke-width="20"/>
+    <!-- Tip sparks -->
+    <circle cx="0"    cy="-192" r="20" fill="#ffe566"/>
+    <circle cx="0"    cy="192"  r="20" fill="#ffe566"/>
+    <circle cx="-192" cy="0"    r="20" fill="#ffe566"/>
+    <circle cx="192"  cy="0"    r="20" fill="#ffe566"/>
+    <circle cx="-136" cy="-136" r="16" fill="#ff6b6b"/>
+    <circle cx="136"  cy="-136" r="16" fill="#ff6b6b"/>
+    <circle cx="-136" cy="136"  r="16" fill="#ff6b6b"/>
+    <circle cx="136"  cy="136"  r="16" fill="#ff6b6b"/>
+  </g>
+</svg>
